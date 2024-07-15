@@ -7,7 +7,7 @@
 class AS5048A
 {
 	public:
-		enum class CommandRegisters : uint16_t //Acceptable values for TDACP and TDACN, assume +/-2.5V
+		enum class CommandRegisters : uint16_t
 		{
 			NOP = 0x000, //R No operation dummy
 			ClearError = 0x0001, //R Read and clear errors
