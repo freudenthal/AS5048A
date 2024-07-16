@@ -46,7 +46,7 @@ class AS5048A
 			bool FramingError;
 		};
 		AS5048A(uint8_t CSPin);
-		begin();
+		Begin();
 		uint16_t GetZeroPosition();
 		void SetZeroPosition(uint16_t ZeroPositionToSet);
 		void SetZeroPosition();

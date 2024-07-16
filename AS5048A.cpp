@@ -23,7 +23,7 @@ AS5048A::CalculateParity(uint16_t Value)
 	return Count & 0x1;
 }
 
-AS5048A::begin()
+AS5048A::Begin()
 {
 	GetAndClearErrors();
 }
