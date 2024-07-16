@@ -1,3 +1,4 @@
+#include "AS5048A.h"
 
 AS5048A::AS5048A(uint8_t CSPinToSet)
 {
@@ -9,7 +10,7 @@ AS5048A::AS5048A(uint8_t CSPinToSet)
 	digitalWrite(CSPin, HIGH);
 }
 
-AS5048A::CalculateParity(uint16_t Value)
+uint8_t AS5048A::CalculateParity(uint16_t Value)
 {
 	uint8_t Count = 0;
 	for (uint8_t i = 0; i < 16; i++)
@@ -23,7 +24,7 @@ AS5048A::CalculateParity(uint16_t Value)
 	return Count & 0x1;
 }
 
-AS5048A::Begin()
+void AS5048A::Begin()
 {
 	GetAndClearErrors();
 }
@@ -45,9 +46,9 @@ uint16_t AS5048A::SendCommand(AS5048A::CommandRegisters Command, bool IsRead)
 	uint16_t CommandToSend = static_cast<uint16_t>(Command);
 	bitWrite(CommandToSend, 14, IsRead);
 	CommandToSend |= static_cast<uint16_t>(CalculateParity(CommandToSend) << 0xF);
-	digitalWrite(CSSelectPin,LOW);
+	digitalWrite(CSPin,LOW);
 	uint16_t Return = SPI.transfer16(CommandToSend);
-	digitalWrite(CSSelectPin,HIGH);
+	digitalWrite(CSPin,HIGH);
 	IsError = bitRead(Return,14);
 	delayMicroseconds(1);
 	if (Verbose)
@@ -115,13 +116,13 @@ AS5048A::DiagnosticData AS5048A::GetDiagnostics()
 	return Return;
 }
 
-AS5048A::ErrorFlags AS5048A::GetAndClearErrors()
+AS5048A::ErrorData AS5048A::GetAndClearErrors()
 {
 	SPI.beginTransaction(ConnectionSettings);
 	SendCommand(CommandRegisters::ClearError, true);
 	uint16_t Error = SendCommand(CommandRegisters::NOP, true);
 	SPI.endTransaction();
-	ErrorFlags Return;
+	ErrorData Return;
 	Return.ParityError = bitRead(Error,static_cast<uint8_t>(ErrorFlags::ParityError));
 	Return.CommandInvalid = bitRead(Error,static_cast<uint8_t>(ErrorFlags::CommandInvalid));
 	Return.FramingError = bitRead(Error,static_cast<uint8_t>(ErrorFlags::FramingError));

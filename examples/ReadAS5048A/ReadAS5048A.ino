@@ -9,16 +9,16 @@ const uint8_t AS5048A_CSPin = 1;
 const uint8_t AS5048A_TXPin = 3;
 const uint8_t AS5048A_RXPin = 4;
 const uint8_t AS5048A_CLKPin = 2;
-const uint8_t AS5048A_ReadDelay = 80;
+const uint32_t AS5048A_ReadDelay = 200000; //80 effective minimum by datasheet
 const bool AS5048A_Verbose = false;
 
 uint32_t AS5048A_LastRead = 0;
-AS5048A Encodder(AS5048A_CSPin);
+AS5048A Encoder(AS5048A_CSPin);
 
 uint16_t Magnitude = 0;
 uint16_t Angle = 0;
 AS5048A::DiagnosticData DiagnosticResults;
-AS5048A::ErrorFlags ErrorResults;
+AS5048A::ErrorData ErrorResults;
 
 void setup()
 {
@@ -27,7 +27,7 @@ void setup()
 	SPI.setTX(AS5048A_TXPin);
 	SPI.begin(false);
 	Serial.begin(SerialUSBSpeed);
-	Encodder.Begin();
+	Encoder.Begin();
 	if (AS5048A_Verbose)
 	{
 		Encoder.SetVerbose(AS5048A_Verbose);
@@ -41,8 +41,8 @@ void loop()
 		AS5048A_LastRead = micros();
 		Magnitude = Encoder.GetMagnitude();
 		Angle = Encoder.GetAngle();
-		DiagnosticResults = GetDiagnostics();
-		ErrorResults = GetAndClearErrors();
+		DiagnosticResults = Encoder.GetDiagnostics();
+		ErrorResults = Encoder.GetAndClearErrors();
 		Serial.println("**********");
 		Serial.print("Magnitude : ");
 		Serial.println(Magnitude);
@@ -50,11 +50,19 @@ void loop()
 		Serial.println(Angle);
 		Serial.print("Gain control : ");
 		Serial.println(DiagnosticResults.AutomaticGainControl);
-		Serial.print("Gain control : ");
-		Serial.println(DiagnosticResults.AutomaticGainControl);
-		Serial.print("Gain control : ");
-		Serial.println(DiagnosticResults.AutomaticGainControl);
-		Serial.print("Gain control : ");
-		Serial.println(DiagnosticResults.AutomaticGainControl);
+		Serial.print("Overcompensation Finished : ");
+		Serial.println(DiagnosticResults.OvercompensationFinished);
+		Serial.print("CORDIC Overflow : ");
+		Serial.println(DiagnosticResults.CORDICOverflow);
+		Serial.print("COMPLow : ");
+		Serial.println(DiagnosticResults.COMPLow);
+		Serial.print("COMPHigh : ");
+		Serial.println(DiagnosticResults.COMPHigh);
+		Serial.print("Parity Error : ");
+		Serial.println(ErrorResults.ParityError);
+		Serial.print("Command Invalid : ");
+		Serial.println(ErrorResults.CommandInvalid);
+		Serial.print("Framing Error : ");
+		Serial.println(ErrorResults.FramingError);
 	}
 }

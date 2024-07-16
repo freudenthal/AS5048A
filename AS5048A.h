@@ -30,7 +30,7 @@ class AS5048A
 			CORDICOverflow = 1,
 			COMPLow = 2, //Too much magnetic field
 			COMPHigh = 3, //Too little magnetic field
-		}
+		};
 		struct DiagnosticData
 		{
 			bool OvercompensationFinished;
@@ -39,21 +39,21 @@ class AS5048A
 			bool COMPHigh;
 			uint8_t AutomaticGainControl; //0 is high field, 255 is low field
 		};
-		struct ErrorFlags
+		struct ErrorData
 		{
 			bool ParityError;
 			bool CommandInvalid;
 			bool FramingError;
 		};
 		AS5048A(uint8_t CSPin);
-		Begin();
+		void Begin();
 		uint16_t GetZeroPosition();
 		void SetZeroPosition(uint16_t ZeroPositionToSet);
 		void SetZeroPosition();
 		uint16_t GetMagnitude();
 		uint16_t GetAngle();
 		DiagnosticData GetDiagnostics();
-		ErrorFlags GetAndClearErrors();
+		ErrorData GetAndClearErrors();
 		SPISettings* GetSPISettings();
 		bool GetVerbose();
 		void SetVerbose(bool VerboseToSet);
@@ -64,6 +64,6 @@ class AS5048A
 		bool IsError;
 		uint8_t CalculateParity(uint16_t Value);
 		uint16_t SendCommand(CommandRegisters Command, bool IsRead);
-}
+};
 
 #endif
